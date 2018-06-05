@@ -22,17 +22,16 @@ namespace sys.app.backup
     {
       var mailer = new Mailer();
       var path = AppDomain.CurrentDomain.BaseDirectory;
-      var files = Directory.EnumerateFiles(path, "*.kbl").ToList();
+      var files = Directory.EnumerateFiles(path, "*.kbl").ToList()
+        .Where(x => DateTime.Now - new FileInfo(x).CreationTime > TimeSpan.FromMinutes(2)).ToList();
 
       if (!files.Any())
         return true;
 
-      if (!mailer.Send(files)) 
+      if (!mailer.Send(files))
         return false;
 
       var backupDirectory = Path.Combine(path, "backup");
-      
-      File.AppendAllText("log.txt", $"Directory path: {path}{Environment.NewLine}");
 
       try
       {
@@ -42,7 +41,8 @@ namespace sys.app.backup
       catch (Exception e)
       {
         Console.WriteLine(e);
-        File.AppendAllText("log.txt", $"Directory create exception: {e}{Environment.NewLine}");
+        File.AppendAllText($"log_{DateTime.Now.Date:yy-MM-dd}.txt",
+          $"Directory create exception: {e}{Environment.NewLine}");
         throw;
       }
 
@@ -54,14 +54,14 @@ namespace sys.app.backup
           var newPath = Path.Combine(backupDirectory, fileName);
           if (File.Exists(newPath))
             File.Delete(newPath);
-          
+
           File.Move(file, newPath);
         }
         catch (Exception e)
         {
           Console.WriteLine(e);
-          File.AppendAllText("log.txt", $"File move exception: {e}{Environment.NewLine}");
-        }   
+          File.AppendAllText($"log_{DateTime.Now.Date:yy-MM-dd}.txt", $"File move exception: {e}{Environment.NewLine}");
+        }
       }
 
       return true;

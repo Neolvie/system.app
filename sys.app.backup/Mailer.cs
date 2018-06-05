@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Net;
 using System.Net.Mail;
 
@@ -7,13 +8,13 @@ namespace sys.app.backup
 {
   public class Mailer
   {
-    private const string MailFrom = "";
-    private const string MailTo = "";
+    private const string MailFrom = "dsad@asdsad.rr";
+    private const string MailTo = "dsad@asdsad.rr";
 
     private const string Host = "smtp.mail.ru";
 
-    private const string Login = "";
-    private const string Password = "";
+    private const string Login = "dsad@asdsad.rr";
+    private const string Password = "dsad@asdsad.rr";
 
     private const string Subject = "Backup mail.";
 
@@ -25,9 +26,16 @@ namespace sys.app.backup
         var client = new SmtpClient(Host, 465);
         client.DeliveryMethod = SmtpDeliveryMethod.Network;
         client.UseDefaultCredentials = false;
+        client.EnableSsl = true;
         mail.Subject = $"{Subject} {DateTime.Now} {Environment.MachineName}";
         mail.Body = $"{Subject} {DateTime.Now}";
         client.Credentials = new NetworkCredential(Login, Password);
+
+        foreach (var file in files)
+        {
+          var attachment = new Attachment(file);
+          mail.Attachments.Add(attachment);
+        }
 
         client.Send(mail);
 
@@ -35,7 +43,7 @@ namespace sys.app.backup
       }
       catch (Exception e)
       {
-        Console.WriteLine(e);
+        File.AppendAllText($"log_{DateTime.Now.Date:yy-MM-dd}.txt", $"Error sending backup: {e}{Environment.NewLine}");
         return false;
       }
     }
