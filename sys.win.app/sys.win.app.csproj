@@ -81,6 +81,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\sys.app.backup\sys.app.backup.csproj">
+      <Project>{ffea3a97-21eb-44dd-97fe-7698ce8b4b0b}</Project>
+      <Name>sys.app.backup</Name>
+    </ProjectReference>
     <ProjectReference Include="..\system.app\system.app.csproj">
       <Project>{6a789ec5-3e48-44fe-87dc-af98ec933041}</Project>
       <Name>system.app</Name>
